@@ -28,7 +28,7 @@ return (
 );
 ```
 
-The `targetComponentID` indicates the value of the `id` field of the HTML element in which the component using `useKeyboardTimer` resides. It cannot refer to an HTML element within the component.
+The `targetComponentID` indicates the value of the `id` field of the HTML element in which the component using `useKeyboardTimer` resides so that the timer may be properly activated by touch-devices. It cannot refer to an HTML element within the component.
 
 The `settings` paramater takes an object of the following `TimerSettings` type:
 

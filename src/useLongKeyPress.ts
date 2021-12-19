@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import useKeyPress from './useKeyPress';
 
-export default function useLongKeyPress(key: string, ms: number, targetComponentID: string) {
-  const pressed = useKeyPress(key, targetComponentID);
+export default function useLongKeyPress(key: string, ms: number) {
+  const pressed = useKeyPress(key);
   const [longPressed, setLongPressed] = useState(false);
   useEffect(() => {
     if (pressed && ms > 0) {

@@ -13,6 +13,14 @@ const settings = {
 };
 
 const App = () => {
+  return (
+    <div id="timer">
+      <Timer />
+    </div>
+  );
+};
+
+const Timer = () => {
   const [times, setTimes] = useState<number[]>([]);
   function onCompleteCallback(time) {
     setTimes([...times, time]);
@@ -25,6 +33,7 @@ const App = () => {
     isTiming,
     plusTwo,
   } = useKeyboardTimer(settings, onCompleteCallback);
+
   return (
     <>
       <div id='timer'>
@@ -38,7 +47,7 @@ const App = () => {
         ))}
       </ul>
     </>
-  );
-};
+  )
+}
 
 ReactDOM.render(<App />, document.getElementById('root'));

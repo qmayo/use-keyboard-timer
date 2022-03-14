@@ -90,14 +90,16 @@ export default function useKeyboardTimer(
 	)
 	const touched = useTouchStart(settings.targetComponentID)
 	const longTouched = useLongTouchStart(timeToHold(settings.timeToRelease), settings.targetComponentID)
+	const escPressed = useKeyPress('Escape')
 	const msUpdate = getTimerUpdate(settings.timerUpdate)
 	useEffect(() => {
 		const inspection = settings.inspection === 'always'
-		const held = spacebarPressed || touched
-		const longHeld = spacebarLongPressed || longTouched
+		const spaceHeld = spacebarPressed || touched
+		const escHeld = escPressed
+		const longSpaceHeld = spacebarLongPressed || longTouched
 		switch (state) {
 			case 'NONE':
-				if (held) {
+				if (spaceHeld) {
 					if (inspection) {
 						setState('SPACE_PRESSED_INSPECTION')
 					} else {
@@ -106,41 +108,43 @@ export default function useKeyboardTimer(
 				}
 				break
 			case 'SPACE_PRESSED_INSPECTION':
-				if (!held) {
+				if (!spaceHeld) {
 					startInspection()
 				}
 				break
 			case 'INSPECTION':
-				if (held) {
+				if (spaceHeld) {
 					setState('SPACE_PRESSED_TIMING')
+				} else if (escHeld) {
+					cancelTimer()
 				}
 				break
 			case 'STOPPED':
-				if (!held) {
+				if (!spaceHeld) {
 					setState('NONE')
 				}
 				break
 			case 'SPACE_PRESSED_TIMING':
-				if (longHeld) {
+				if (longSpaceHeld) {
 					setState('SPACE_PRESSED_VALID')
-				} else if (!held) {
+				} else if (!spaceHeld) {
 					setState(inspection ? 'INSPECTION' : 'NONE')
 				}
 				break
 			case 'SPACE_PRESSED_VALID':
-				if (!held) {
+				if (!spaceHeld) {
 					startTimer()
-				} else if (!held) {
+				} else if (!spaceHeld) {
 					setState('NONE')
 				}
 				break
 			case 'STARTED':
-				if (held) {
+				if (spaceHeld) {
 					stopTimer()
 				}
 				break
 		}
-	}, [spacebarLongPressed, spacebarPressed, touched, longTouched])
+	}, [spacebarLongPressed, spacebarPressed, touched, longTouched, escPressed])
 
 	function stopTimer() {
 		let newTime = dnf.current === true ? -1 : Date.now() - startRef.current
@@ -157,6 +161,16 @@ export default function useKeyboardTimer(
 			? { type: '+2', amount: 2 }
 			: undefined
 		onCompleteCallback(newTime, penalty)
+		dnf.current = false
+		plusTwo.current = false
+	}
+
+	function cancelTimer() {
+		setIsTiming(false)
+		setState('STOPPED')
+		setInspectionTime(15)
+		intervalRef.current && clearInterval(intervalRef.current)
+		intervalRef.current = null
 		dnf.current = false
 		plusTwo.current = false
 	}

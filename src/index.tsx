@@ -1,2 +1,3 @@
-import useKeyboardTimer from './useKeyboardTimer';
+import useKeyboardTimer, { useInspectionOnlyTimer } from './useKeyboardTimer';
+export { useInspectionOnlyTimer };
 export default useKeyboardTimer;

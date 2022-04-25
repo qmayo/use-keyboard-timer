@@ -24,6 +24,12 @@ export type TimerState =
 	| 'STOPPED'
 	| 'PAUSED'
 
+export type InspectionOnlyTimerState =
+	| 'NONE'
+	| 'INSPECTION'
+	| 'SPACE_PRESSED_INSPECTION'
+	| 'STOPPED'
+
 export interface KeyboardTimer {
 	time: number
 	isTiming: boolean
@@ -228,5 +234,94 @@ export default function useKeyboardTimer(
 		unpause,
 		dnf: dnf.current,
 		plusTwo: plusTwo.current,
+	}
+}
+
+export function useInspectionOnlyTimer(settings: Timer.InspectionOnlyTimerSettings) {
+	const timeToHold = (timeToRelease: Timer.timeToRelease) => {
+		switch (timeToRelease) {
+			case 'stackmat':
+				return 300
+			case 'none':
+				return 0
+			default:
+				return 300
+		}
+	}
+	
+
+	const [isInspecting, setIsInspecting] = useState<boolean>(false);
+	const [state, setState] = useState<InspectionOnlyTimerState>('NONE')
+	const [inspectionTime, setInspectionTime] = useState(15)
+	const inspectionTimeRef = useRef<number>(inspectionTime)
+	const intervalRef = useRef<null | NodeJS.Timeout>(null)
+	inspectionTimeRef.current = inspectionTime
+	const spacebarPressed = useKeyPress(' ')
+	const spacebarLongPressed = useLongKeyPress(
+		' ',
+		timeToHold(settings.timeToRelease)
+	)
+	const touched = useTouchStart(settings.targetComponentID)
+	const longTouched = useLongTouchStart(timeToHold(settings.timeToRelease), settings.targetComponentID)
+
+	function startInspection() {
+		setState('INSPECTION')
+		setIsInspecting(true)
+		setInspectionTime(15)
+		const interval = setInterval(() => tickInspection(), 1000)
+		intervalRef.current = interval
+	}
+	function tickInspection() {
+		if (inspectionTimeRef.current > -2) {
+		  setInspectionTime(inspectionTimeRef.current - 1)
+		} else {
+			clearInterval(intervalRef.current!)
+			intervalRef.current = null
+			stopInspection()
+		}
+	}
+
+	function stopInspection() {
+		setState('STOPPED')
+		setIsInspecting(false)
+		setInspectionTime(15)
+		intervalRef.current && clearInterval(intervalRef.current)
+		intervalRef.current = null
+	}
+
+	useEffect(() => {
+		const spaceHeld = spacebarPressed || touched;
+		//const longSpaceHeld = spacebarLongPressed || longTouched;
+		switch (state) {
+			case 'NONE':
+				if (spaceHeld) {
+					setState('SPACE_PRESSED_INSPECTION')
+				}
+				break
+			case 'SPACE_PRESSED_INSPECTION':
+				if (!spaceHeld) {
+					startInspection();
+					setIsInspecting(true)
+				}
+				break
+			case 'INSPECTION':
+				if (spaceHeld) {
+					setState('STOPPED')
+					stopInspection()
+					setIsInspecting(false);
+					
+				}
+				break
+			case 'STOPPED':
+				if (!spaceHeld) {
+					setState('NONE')
+				}
+		}
+	}, [spacebarLongPressed, spacebarPressed, touched])
+
+	return {
+		inspectionTime,
+		state,
+		isInspecting
 	}
 }

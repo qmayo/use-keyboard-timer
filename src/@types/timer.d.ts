@@ -11,6 +11,10 @@ declare namespace Timer {
     timeToRelease: timeToRelease;
     targetComponentID: string;
   }
+  interface InspectionOnlyTimerSettings {
+    timeToRelease: timeToRelease;
+    targetComponentID: string;
+  }
   type timerUpdate =
     | 'seconds'
     | 'centiseconds'

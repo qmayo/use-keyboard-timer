@@ -1,7 +1,7 @@
 import 'react-app-polyfill/ie11';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import useKeyboardTimer from '../src/';
+import useKeyboardTimer, { useInspectionOnlyTimer } from '../src/';
 import { useState } from 'react';
 
 const settings = {
@@ -15,7 +15,7 @@ const settings = {
 const App = () => {
   return (
     <div id="timer">
-      <Timer />
+      <Timer  />
     </div>
   );
 };
@@ -36,7 +36,7 @@ const Timer = () => {
 
   return (
     <>
-      <div id='timer'>
+      <div>
         {`Time: ${time} \n State: ${state} \n Inspection: ${inspectionTime} \n DNF: ${dnf} \n Plus 2: ${plusTwo}`}
       </div>
       <br />
@@ -46,6 +46,22 @@ const Timer = () => {
           <li key={index}>{`${index+1}. ${time} ms`}</li>
         ))}
       </ul>
+    </>
+  )
+}
+
+const InspectionTimer = () => {
+  const {
+    inspectionTime,
+    isInspecting,
+    state
+  } = useInspectionOnlyTimer({timeToRelease: 'stackmat', targetComponentID: 'timer'});
+
+  return (
+    <>
+      <div>
+        {`Inspection time: ${inspectionTime} \n State: ${state} \n isInspecting: ${isInspecting}`}
+      </div>
     </>
   )
 }

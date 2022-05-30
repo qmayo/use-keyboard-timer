@@ -238,7 +238,7 @@ export default function useKeyboardTimer(
 }
 
 export function useInspectionOnlyTimer(settings: Timer.InspectionOnlyTimerSettings) {
-	const timeToHold = (timeToRelease: Timer.timeToRelease) => {
+	/* const timeToHold = (timeToRelease: Timer.timeToRelease) => {
 		switch (timeToRelease) {
 			case 'stackmat':
 				return 300
@@ -247,7 +247,7 @@ export function useInspectionOnlyTimer(settings: Timer.InspectionOnlyTimerSettin
 			default:
 				return 300
 		}
-	}
+	} */
 	
 
 	const [isInspecting, setIsInspecting] = useState<boolean>(false);
@@ -257,12 +257,12 @@ export function useInspectionOnlyTimer(settings: Timer.InspectionOnlyTimerSettin
 	const intervalRef = useRef<null | NodeJS.Timeout>(null)
 	inspectionTimeRef.current = inspectionTime
 	const spacebarPressed = useKeyPress(' ')
-	const spacebarLongPressed = useLongKeyPress(
+	/* const spacebarLongPressed = useLongKeyPress(
 		' ',
 		timeToHold(settings.timeToRelease)
-	)
+	) */
 	const touched = useTouchStart(settings.targetComponentID)
-	const longTouched = useLongTouchStart(timeToHold(settings.timeToRelease), settings.targetComponentID)
+	//const longTouched = useLongTouchStart(timeToHold(settings.timeToRelease), settings.targetComponentID)
 
 	function startInspection() {
 		setState('INSPECTION')
@@ -317,7 +317,7 @@ export function useInspectionOnlyTimer(settings: Timer.InspectionOnlyTimerSettin
 					setState('NONE')
 				}
 		}
-	}, [spacebarLongPressed, spacebarPressed, touched])
+	}, [spacebarPressed, touched])
 
 	return {
 		inspectionTime,
